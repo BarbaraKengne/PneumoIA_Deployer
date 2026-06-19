@@ -1,0 +1,10 @@
+flask
+flask-cors
+gunicorn
+pillow
+numpy
+scikit-learn
+scikit-image
+joblib
+google-genai
+python-dotenv

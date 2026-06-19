@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PneuMoAI - Analyse</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+<div style="display:flex;align-items:center;gap:1rem">
+<a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Accueil</a>
+<span class="logo-text">PneuMo<span class="logo-accent">AI</span></span>
+</div>
+<div class="header-right">
+<div class="status-badge">
+<span class="status-dot"></span> Système actif
+</div>
+</div>
+</header>
+
+<!-- CONTENU -->
+<div class="main-grid">
+
+<!-- Upload unique (1 ou plusieurs) -->
+<div class="card">
+<input type="file" id="inputImage" accept="image/*" multiple class="hidden">
+<div id="zoneUpload" class="upload-zone">
+<div class="upload-ico"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+<p class="upload-title">Déposez une ou plusieurs radiographies</p>
+<p class="upload-sub">1 image = analyse détaillée · Plusieurs = analyse par lot · PNG, JPG</p>
+<button class="btn-browse">Parcourir les fichiers</button>
+</div>
+</div>
+
+<!-- Résultat (analyse simple) -->
+<div id="blocResultat" class="card hidden">
+<div class="card-title"><i class="fa-solid fa-chart-simple"></i> Résultat de l'analyse</div>
+<div class="result-row">
+<div class="xray-viewer">
+<i id="iconPoumon" class="fa-solid fa-lungs"></i>
+<img id="previewImage" src="" alt="Radio" class="hidden">
+<div class="scan-anim"></div>
+</div>
+<div class="result-info">
+<div class="result-top">
+<span class="result-lbl">Diagnostic</span>
+<span id="badgeStatut" class="badge-wait">EN ATTENTE</span>
+</div>
+<div>
+<span id="confianceVal" class="conf-val">--</span>
+<span class="conf-unit">de certitude</span>
+</div>
+<div class="bar-bg">
+<div id="barreConfiance" class="bar-fill" style="width:0%"></div>
+</div>
+<p id="statutLabel" class="status-txt">En attente d'une radiographie.</p>
+<button id="btnPdf" onclick="genererPDF()" class="btn-browse hidden" style="margin-top:0.75rem">
+<i class="fa-solid fa-file-arrow-down"></i> Télécharger le rapport
+</button>
+<button id="btnHeatmap" onclick="genererHeatmap()" class="btn-browse hidden" style="margin-top:0.5rem">
+<i class="fa-solid fa-fire"></i> Voir la carte de chaleur
+</button>
+</div>
+</div>
+
+<!-- Zone heatmap -->
+<div id="zoneHeatmap" class="hidden" style="margin-top:1.5rem">
+<div class="hm-compare">
+    <div class="hm-col">
+        <span class="hm-col-lbl">Radiographie originale</span>
+        <img id="imgOriginale" alt="Radio originale" class="hm-img">
+    </div>
+    <div class="hm-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+    <div class="hm-col">
+        <span class="hm-col-lbl">Carte de chaleur</span>
+        <img id="imgHeatmap" alt="Carte de chaleur" class="hm-img">
+    </div>
+</div>
+<div class="hm-scale">
+    <span class="hm-scale-lbl">Faible influence</span>
+    <div class="hm-gradient"></div>
+    <span class="hm-scale-lbl">Forte influence</span>
+</div>
+<div class="hm-explain">
+    <i class="fa-solid fa-circle-info"></i>
+    <p>Cette carte est générée par <b>occlusion</b> : chaque zone de la radio est masquée tour à tour, et l'on mesure de combien la prédiction change. Les zones qui font le plus chuter la confiance — en <span style="color:#e11d48;font-weight:600">rouge</span> — sont celles qui ont le plus influencé la décision. Les zones en <span style="color:#3b82f6;font-weight:600">bleu</span> ont eu peu d'impact.</p>
+</div>
+</div>
+</div>
+
+<!-- Résultat (analyse par lot) -->
+<div id="blocLot" class="card hidden">
+<div class="card-title"><i class="fa-solid fa-layer-group"></i> Analyse par lot</div>
+<div id="lotResume" class="lot-resume">
+<div class="lot-stats">
+<div class="lot-stat"><div id="lotTotal" class="lot-stat-num">0</div><div class="lot-stat-lbl">Radios</div></div>
+<div class="lot-stat"><div id="lotPneumo" class="lot-stat-num pneumo">0</div><div class="lot-stat-lbl">Pneumonies</div></div>
+<div class="lot-stat"><div id="lotNormal" class="lot-stat-num normal">0</div><div class="lot-stat-lbl">Normales</div></div>
+</div>
+<button class="btn-lot-pdf" onclick="genererPDFLot()"><i class="fa-solid fa-file-arrow-down"></i> Rapport du lot</button>
+</div>
+<div id="lotGrid" class="lot-grid"></div>
+</div>
+
+<!-- Historique -->
+<div class="card">
+<div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Historique de la session</div>
+<table class="history-table">
+<thead>
+<tr>
+<th>ID</th><th>Heure</th><th>Diagnostic</th><th>Confiance</th>
+</tr>
+</thead>
+<tbody id="tbodyHistorique">
+<tr><td colspan="4" class="history-empty">Aucune analyse effectuée.</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<!-- CHATBOT DRAGGABLE -->
+<div id="chatWrapper">
+<div id="chatBubble">
+<i class="fa-solid fa-comment-medical"></i>
+<span id="chatNotif" class="hidden">1</span>
+</div>
+<div id="chatPanel" class="hidden">
+<div class="chat-head">
+<div class="chat-agent">
+<div class="chat-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+<div>
+<div class="chat-name">MedAI Assistant</div>
+<div class="chat-online"><span class="chat-online-dot"></span> En ligne</div>
+</div>
+</div>
+<button class="chat-close" onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="chat-msgs" id="chatMessages">
+<div class="msg-ai">
+<div class="msg-ava msg-ava-ai">AI</div>
+<div class="msg-txt">Bonjour ! Déposez une radiographie pour démarrer. Je suis là pour expliquer les résultats et répondre à vos questions.</div>
+</div>
+</div>
+<div class="chat-input-row">
+<input id="inputChat" type="text" placeholder="Posez une question..."
+onkeydown="if(event.key==='Enter') envoyerMessage(this.value)">
+<button class="chat-send" onclick="envoyerMessage(document.getElementById('inputChat').value)">
+<i class="fa-solid fa-paper-plane"></i>
+</button>
+</div>
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

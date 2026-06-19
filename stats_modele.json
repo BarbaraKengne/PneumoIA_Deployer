@@ -1,0 +1,19 @@
+{
+  "accuracy": 92.45,
+  "n_train": 2532,
+  "n_test": 318,
+  "tn": 149,
+  "fp": 10,
+  "fn": 14,
+  "tp": 145,
+  "normal": {
+    "precision": 91.4,
+    "recall": 93.7,
+    "f1": 92.5
+  },
+  "pneumonie": {
+    "precision": 93.5,
+    "recall": 91.2,
+    "f1": 92.4
+  }
+}

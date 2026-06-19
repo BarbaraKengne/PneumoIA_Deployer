@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PneuMoAI - Détection de Pneumonie</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='accueil.css') }}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-lungs"></i></div>
+        <span class="logo-text">PneuMo<span class="logo-accent">AI</span></span>
+    </div>
+    <nav>
+        <a href="#maladie">La maladie</a>
+        <a href="#equipe">Notre équipe</a>
+        <a href="/stats">Performances</a>
+        <a href="/dashboard" class="btn-cta">Analyser une radio <i class="fa-solid fa-arrow-right"></i></a>
+    </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-left">
+        <div class="hero-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> Intelligence Artificielle au service de la santé</div>
+        <h1 class="hero-title">
+            Détectez la <span class="blue">Pneumonie</span><br>
+            grâce à l'<span class="blue">Intelligence Artificielle</span>
+        </h1>
+        <p class="hero-desc">
+            Déposez une radiographie pulmonaire et obtenez en quelques secondes
+            un diagnostic automatique accompagné d'une explication par notre agent IA.
+        </p>
+
+        <!-- Carte upload (visuelle, redirige vers le dashboard) -->
+        <a href="/dashboard" class="upload-card">
+            <div class="upload-ico"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <p class="upload-title">Déposez votre radiographie ici</p>
+            <p class="upload-sub">PNG, JPG · Max 10 MB</p>
+            <span class="btn-upload">Choisir une image</span>
+        </a>
+        <p class="secure"><i class="fa-solid fa-lock"></i> Données sécurisées et confidentielles</p>
+    </div>
+
+    <div class="hero-right">
+        <i class="fa-solid fa-lungs hero-lungs"></i>
+        <div class="hero-card">
+            <div class="card-line">
+                <span class="card-line-lbl">Analyse en cours</span>
+                <span class="card-line-pct">100%</span>
+            </div>
+            <div class="prog-bg"><div class="prog-fill"></div></div>
+
+            <p class="card-result-lbl">Résultat du modèle</p>
+            <div class="result-box">
+                <div class="result-check"><i class="fa-solid fa-check"></i></div>
+                <div class="result-val">NORMAL</div>
+                <div class="result-conf">87% de confiance · HistGradientBoosting</div>
+            </div>
+
+            <div class="agent-box">
+                <div class="agent-ico"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <p class="agent-title">Explication de l'agent IA</p>
+                    <p class="agent-txt">Aucune anomalie significative détectée. Les champs pulmonaires sont clairs, sans opacité suspecte.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MALADIE -->
+<section id="maladie" class="section">
+    <h2 class="section-title">Comprendre la maladie</h2>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="ico ico-b"><i class="fa-solid fa-book-medical"></i></div>
+            <h3 class="ico-title-b">Définition</h3>
+            <p>Infection qui enflamme les alvéoles pulmonaires, pouvant les remplir de liquide. Elle peut être causée par des bactéries, des virus ou des champignons.</p>
+        </div>
+        <div class="info-card">
+            <div class="ico ico-g"><i class="fa-solid fa-thermometer"></i></div>
+            <h3 class="ico-title-g">Symptômes</h3>
+            <p>Toux persistante, fièvre, frissons, douleurs thoraciques et difficultés à respirer. Les symptômes varient selon l'état de santé du patient.</p>
+        </div>
+        <div class="info-card">
+            <div class="ico ico-p"><i class="fa-solid fa-globe"></i></div>
+            <h3 class="ico-title-p">Impact mondial</h3>
+            <p>L'une des premières causes de mortalité infantile dans le monde. Un diagnostic précoce et rapide est essentiel pour améliorer les chances de guérison.</p>
+        </div>
+        <div class="info-card">
+            <div class="ico ico-o"><i class="fa-solid fa-x-ray"></i></div>
+            <h3 class="ico-title-o">Rôle de la radiographie</h3>
+            <p>La radio thoracique est l'examen de référence. Notre modèle ML analyse automatiquement les caractéristiques visuelles pour détecter les anomalies.</p>
+        </div>
+    </div>
+</section>
+<!-- IA EXPLICABLE / HEATMAP -->
+<section id="explicabilite" class="section">
+    <h2 class="section-title">Une IA qui s'explique</h2>
+    <p class="section-sub">Notre modèle ne se contente pas de prédire : il montre ce qu'il a regardé</p>
+
+    <div class="xai-grid">
+        <div class="xai-text">
+            <div class="xai-tag"><i class="fa-solid fa-fire"></i> Carte de chaleur</div>
+            <h3 class="xai-title">Comprendre <span class="blue">pourquoi</span> le modèle décide</h3>
+            <p class="xai-desc">
+                En médecine, on ne peut pas faire confiance à une IA qui dit juste « pneumonie »
+                sans se justifier. Notre carte de chaleur révèle les zones de la radiographie qui
+                ont le plus influencé la décision.
+            </p>
+            <div class="xai-steps">
+                <div class="xai-step">
+                    <div class="xai-num">1</div>
+                    <p>On masque tour à tour des zones de la radio</p>
+                </div>
+                <div class="xai-step">
+                    <div class="xai-num">2</div>
+                    <p>On mesure de combien la prédiction change</p>
+                </div>
+                <div class="xai-step">
+                    <div class="xai-num">3</div>
+                    <p>Les zones décisives apparaissent en rouge</p>
+                </div>
+            </div>
+            <div class="xai-legend">
+                <span class="leg-item"><span class="leg-dot leg-red"></span> Zone décisive</span>
+                <span class="leg-item"><span class="leg-dot leg-blue"></span> Peu d'impact</span>
+            </div>
+        </div>
+
+        <div class="xai-visual">
+            <img src="{{ url_for('static', filename='exemple-headmap.png') }}" alt="Exemple de carte de chaleur" class="xai-img">
+            <p class="xai-caption">Exemple réel : les réseaux turquoise/rouges montrent les zones analysées par le modèle.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ÉQUIPE -->
+<section id="equipe" class="section">
+    <h2 class="section-title">L'équipe</h2>
+    <div class="equipe-grid">
+        <div class="membre">
+            <img src="{{ url_for('static', filename='arielle.jpeg') }}" alt="Arielle" class="membre-photo">
+            <h4 class="membre-prenom blue">Arielle</h4>
+            <p class="membre-nom">Arielle Assoukou</p>
+            <p class="membre-message">"J'ai adoré transformer des radios en features exploitables par le modèle."</p>
+            <a href="mailto:arielle.assoukou@etu.univ-amu.fr" class="mail-lnk"><i class="fa-solid fa-envelope"></i> Écrire</a>
+        </div>
+        <div class="membre">
+            <img src="{{ url_for('static', filename='barbara.png') }}" alt="Barbara" class="membre-photo">
+            <h4 class="membre-prenom green">Barbara</h4>
+            <p class="membre-nom">Barbara Nguimfack Kengne</p>
+            <p class="membre-message">"Relier le modèle à une interface claire et utile a été le plus passionnant."</p>
+            <a href="mailto:barbara.NGUIMFACK-KENGNE@etu.univ-amu.fr" class="mail-lnk"><i class="fa-solid fa-envelope"></i> Écrire</a>
+        </div>
+        <div class="membre">
+            <img src="{{ url_for('static', filename='salimatou.jpeg') }}" alt="Salimatou" class="membre-photo">
+            <h4 class="membre-prenom purple">Salimatou</h4>
+            <p class="membre-nom">Salimatou Baldé</p>
+            <p class="membre-message">"Comparer le ML classique au deep learning m'a beaucoup appris."</p>
+            <a href="mailto:salimatou.balde@etu.univ-amu.fr" class="mail-lnk"><i class="fa-solid fa-envelope"></i> Écrire</a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-wrap">
+    <div class="cta-banner">
+        <div class="cta-ico"><i class="fa-solid fa-lungs"></i></div>
+        <div class="cta-text">
+            <h3>Prête à tester le système ?</h3>
+            <p>Déposez une radiographie et obtenez en quelques secondes un diagnostic assisté par notre IA.</p>
+        </div>
+        <a href="/dashboard" class="btn-cta-white">Analyser une radio <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-logo">
+        <div class="logo-icon-sm"><i class="fa-solid fa-lungs"></i></div>
+        <span>PneuMo<span class="logo-accent">AI</span></span>
+    </div>
+    <p class="footer-txt">Projet L3 IAA · 2026 · Arielle Assoukou, Barbara Nguimfack Kengne, Salimatou Baldé</p>
+    <i class="fa-solid fa-heart-pulse footer-heart"></i>
+</footer>
+
+</body>
+</html>

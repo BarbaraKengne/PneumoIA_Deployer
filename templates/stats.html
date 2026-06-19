@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PneuMoAI - Performances du modèle</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='stats.css') }}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+<div style="display:flex;align-items:center;gap:1rem">
+<a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Accueil</a>
+<span class="logo-text">PneuMo<span class="logo-accent">AI</span></span>
+</div>
+<a href="/dashboard" class="btn-cta">Analyser une radio →</a>
+</header>
+
+<div class="stats-wrap">
+
+<div class="stats-head">
+<div class="section-tag"><i class="fa-solid fa-chart-line"></i> Performances du modèle</div>
+<h1 class="stats-title">Quelle confiance accorder à <span class="pink">PneuMoAI</span> ?</h1>
+<p class="stats-sub">Résultats obtenus par notre modèle HistGradientBoosting sur un jeu de test indépendant.</p>
+</div>
+
+{% if stats %}
+
+<!-- CHIFFRES CLÉS -->
+<div class="kpi-grid">
+<div class="kpi-card kpi-main">
+<div class="kpi-label">Précision globale</div>
+<div class="kpi-value">{{ stats.accuracy }}%</div>
+<div class="kpi-hint">de bonnes prédictions sur le test</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">Images d'entraînement</div>
+<div class="kpi-value">{{ stats.n_train }}</div>
+<div class="kpi-hint">radiographies analysées</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">Images de test</div>
+<div class="kpi-value">{{ stats.n_test }}</div>
+<div class="kpi-hint">jamais vues à l'entraînement</div>
+</div>
+</div>
+
+<!-- MATRICE DE CONFUSION -->
+<div class="card">
+<div class="card-title"><i class="fa-solid fa-table-cells"></i> Matrice de confusion</div>
+<p class="card-desc">Le détail des bonnes réponses (vert) et des erreurs (rouge) du modèle.</p>
+<div class="matrix">
+<div class="matrix-corner"></div>
+<div class="matrix-h">Prédit : NORMAL</div>
+<div class="matrix-h">Prédit : PNEUMONIE</div>
+
+<div class="matrix-v">Réel : NORMAL</div>
+<div class="matrix-cell ok"><span class="mc-num">{{ stats.tn }}</span><span class="mc-lbl">Vrais négatifs</span></div>
+<div class="matrix-cell err"><span class="mc-num">{{ stats.fp }}</span><span class="mc-lbl">Faux positifs</span></div>
+
+<div class="matrix-v">Réel : PNEUMONIE</div>
+<div class="matrix-cell err"><span class="mc-num">{{ stats.fn }}</span><span class="mc-lbl">Faux négatifs</span></div>
+<div class="matrix-cell ok"><span class="mc-num">{{ stats.tp }}</span><span class="mc-lbl">Vrais positifs</span></div>
+</div>
+<p class="matrix-note">
+<i class="fa-solid fa-circle-info"></i>
+Les <b>faux négatifs</b> ({{ stats.fn }}) sont les cas les plus sensibles en médecine : une pneumonie non détectée.
+</p>
+</div>
+
+<!-- METRIQUES PAR CLASSE -->
+<div class="card">
+<div class="card-title"><i class="fa-solid fa-list-check"></i> Indicateurs détaillés</div>
+<table class="metrics-table">
+<thead>
+<tr><th>Classe</th><th>Précision</th><th>Rappel</th><th>Score F1</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="badge-normal">NORMAL</span></td>
+<td>{{ stats.normal.precision }}%</td>
+<td>{{ stats.normal.recall }}%</td>
+<td>{{ stats.normal.f1 }}%</td>
+</tr>
+<tr>
+<td><span class="badge-pneumo">PNEUMONIE</span></td>
+<td>{{ stats.pneumonie.precision }}%</td>
+<td>{{ stats.pneumonie.recall }}%</td>
+<td>{{ stats.pneumonie.f1 }}%</td>
+</tr>
+</tbody>
+</table>
+<div class="legende">
+<p><b>Précision</b> : quand le modèle annonce une classe, à quelle fréquence a-t-il raison.</p>
+<p><b>Rappel</b> : parmi tous les vrais cas d'une classe, combien le modèle en retrouve.</p>
+<p><b>Score F1</b> : équilibre entre précision et rappel.</p>
+</div>
+</div>
+
+{% else %}
+
+<div class="card">
+<p class="empty-msg">
+<i class="fa-solid fa-triangle-exclamation"></i>
+Les statistiques ne sont pas encore disponibles.<br>
+Lance <code>python entrainer_modele.py</code> pour générer le fichier <code>stats_modele.json</code>.
+</p>
+</div>
+
+{% endif %}
+
+</div>
+
+<footer>PneuMoAI · Performances du modèle · Projet L3 IAA</footer>
+
+</body>
+</html>
